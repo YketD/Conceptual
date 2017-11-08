@@ -1,4 +1,5 @@
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -41,21 +42,17 @@ public class main {
         BufferedReader file = new BufferedReader(new InputStreamReader(is));
         String line;
         JSONObject object;
-//        while ((line = file.readLine()) != null){
-//            object = ;
-//            ArrayList<String> id = new ArrayList<>();
-            for ( int i = 0; i < 50; i++){
-                ArrayList<String> id = new ArrayList<>();
-                for (int j = 0; j < 140; j++){
-                    id.add(new JSONObject(file.readLine()).get("id").toString());
-                }
-                PrintWriter out = new PrintWriter("filename3.txt");
-                CallThread a = new CallThread(id, out);
-                a.start();
-            }
-//            doBusinessget(object.get("id").toString(), out);
-//        }
+        PrintWriter out = new PrintWriter("business.txt");
+        PrintWriter out2 = new PrintWriter("reviews.txt");
 
+        while ((line = file.readLine()) != null){
+            object = new JSONObject(line);
+            doBusinessget(object.get("id").toString(), out);
+            //doReviewsGet(object.get("id").toString(), out2);
+
+
+        }
+        out.close();
         is.close();
         file.close();
     }
@@ -94,7 +91,7 @@ public class main {
         rad.add(9, 4000);
     }
 
-    private void getIds(){
+    private void getIds() throws JSONException {
         InputStream is;
 
         try {
@@ -106,13 +103,19 @@ public class main {
             is = new FileInputStream("filename.txt");
             BufferedReader file = new BufferedReader(new InputStreamReader(is));
 
-            while ((line = file.readLine()) != null){
+            while ((line = file.readLine()) != null)
+                try {
+                    {
 
-                object = new JSONObject(line);
-                System.out.println(object.toString());
-                result = new JSONObject().put("phone",object.get("phone")).put("id", object.get("id"));
-                out.println(result.toString());
-            }
+                        object = new JSONObject(line);
+                        System.out.println(object.toString());
+                        result = new JSONObject().put("phone",object.get("phone")).put("id", object.get("id"));
+                        out.println(result.toString());
+                    }
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             is.close();
             out.close();
         } catch (FileNotFoundException e) {
@@ -146,7 +149,35 @@ public class main {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
         object = new JSONObject(in.readLine());
-//        System.out.println(object.toString());
+        //System.out.println(object.toString());
+        //result = new JSONObject().put("phone",object.get("phone")).put("id", object.get("id"));
+        out.println(object.toString());
+
+    }
+
+    private void doReviewsGet(String id, PrintWriter out) throws Exception{
+        JSONObject object;
+        Object objectx;
+        JSONObject result;
+        String line;
+
+        url = "https://api.yelp.com/v3/businesses/" + id + "/reviews";
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        // optional default is GET
+        con.setRequestMethod("GET");
+        final String USER_AGENT = "Mozilla/5.0";
+        //add request header
+        con.setRequestProperty("User-Agent", USER_AGENT);
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        con.setRequestProperty("Authorization", "Bearer 210BDrXEy368L3lIufoUWRTN7upFkGdTG5lzwKihbtaXqdWM0RyKC8REFM6ZsGGmvWncMyLY1McYJffInq-0G7RINXUrjPauPegkcS9k2tiEwNs1xgGJjaVlOOzkWXYx");
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        object = new JSONObject(in.readLine());
+        System.out.println(object.toString());
 //        result = new JSONObject().put("phone",object.get("phone")).put("id", object.get("id"));
         out.println(object.toString());
 
